@@ -5,6 +5,7 @@ backend/backend.env
 # Hardhat files
 /cache
 /artifacts
+SmartContract/sc.env
 
 # TypeChain files
 /typechain

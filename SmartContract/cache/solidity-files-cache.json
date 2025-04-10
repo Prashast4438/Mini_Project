@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "/Users/prashastnigam/Library/Mobile Documents/com~apple~CloudDocs/Desktop/New Folder With Items/Mini_project/contracts/Lock.sol": {
+    "/Users/prashastnigam/Library/Mobile Documents/com~apple~CloudDocs/Desktop/New Folder With Items/Mini_project/SmartContract/contracts/Lock.sol": {
       "lastModificationDate": 1744256799422,
       "contentHash": "7eee587c347fe6b1de50c96688cb9477",
       "sourceName": "contracts/Lock.sol",
@@ -37,7 +37,7 @@
         "Lock"
       ]
     },
-    "/Users/prashastnigam/Library/Mobile Documents/com~apple~CloudDocs/Desktop/New Folder With Items/Mini_project/contracts/NFTAuth.sol": {
+    "/Users/prashastnigam/Library/Mobile Documents/com~apple~CloudDocs/Desktop/New Folder With Items/Mini_project/SmartContract/contracts/NFTAuth.sol": {
       "lastModificationDate": 1744257986856,
       "contentHash": "d4d53e21a582534c326122fcc099e9a3",
       "sourceName": "contracts/NFTAuth.sol",
