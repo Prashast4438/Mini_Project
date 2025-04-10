@@ -5,6 +5,7 @@ import { ethers } from "ethers";
 import fs from "fs";
 import cors from "cors";
 import { imageHash } from "image-hash";
+import path from "path";
 
 dotenv.config();
 
@@ -13,7 +14,9 @@ app.use(express.json());
 app.use(cors());
 
 // Load contract ABI
-const contractABI = JSON.parse(fs.readFileSync("./Users/prashastnigam/Library/Mobile Documents/com~apple~CloudDocs/Desktop/New Folder With Items/Mini_project/Backend/artifacts/contracts/NFTAuth.sol/NFTAuth.json", "utf8"));
+const contractPath = path.resolve("contracts", "NFTAuth.json");
+const contractABI = JSON.parse(fs.readFileSync(contractPath, "utf8"));
+
 const provider = new ethers.JsonRpcProvider(process.env.INFURA_RPC_URL);
 const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 const contract = new ethers.Contract(process.env.CONTRACT_ADDRESS, contractABI, wallet);
