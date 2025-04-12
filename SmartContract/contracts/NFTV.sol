@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-contract NFTAuth {
+contract NFTV {
     address public owner;
     
     struct NFTData {
@@ -13,7 +13,6 @@ contract NFTAuth {
 
     event NFTRegistered(string indexed name, string pHash);
     
-
     constructor() {
         owner = msg.sender;
     }
@@ -30,11 +29,14 @@ contract NFTAuth {
         nftHashes[name] = NFTData(pHash, true);
         emit NFTRegistered(name, pHash);
     }
-    // 🔹 Function to verify NFT (Exact match only - On-chain check)
-    function verifyNFT(string memory name, string memory uploadedPhash) public view returns (bool) {
-        require(nftHashes[name].exists, "NFT not registered");
-        bool isExactMatch = keccak256(abi.encodePacked(nftHashes[name].pHash)) == keccak256(abi.encodePacked(uploadedPhash));
-       
-        return isExactMatch;
+
+    // 🔹 Function to get NFT hash for verification
+    // This function name matches what the backend is calling
+    function getNFTPhash(string memory name) public view returns (string memory) {
+        NFTData memory nftData = nftHashes[name];
+        if (!nftData.exists) {
+            revert("NFT not found");
+        }
+        return nftData.pHash;
     }
 }

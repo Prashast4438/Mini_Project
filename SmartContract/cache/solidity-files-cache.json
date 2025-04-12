@@ -37,10 +37,10 @@
         "Lock"
       ]
     },
-    "/Users/prashastnigam/Library/Mobile Documents/com~apple~CloudDocs/Desktop/New Folder With Items/Mini_project/SmartContract/contracts/NFTAuth.sol": {
-      "lastModificationDate": 1744257986856,
-      "contentHash": "d4d53e21a582534c326122fcc099e9a3",
-      "sourceName": "contracts/NFTAuth.sol",
+    "/Users/prashastnigam/Library/Mobile Documents/com~apple~CloudDocs/Desktop/New Folder With Items/Mini_project/SmartContract/contracts/NFTV.sol": {
+      "lastModificationDate": 1744434477371,
+      "contentHash": "7718a7314b6090f13d912c113c73080d",
+      "sourceName": "contracts/NFTV.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -70,7 +70,7 @@
         "^0.8.19"
       ],
       "artifacts": [
-        "NFTAuth"
+        "NFTV"
       ]
     }
   }
