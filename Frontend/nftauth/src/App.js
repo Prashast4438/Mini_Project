@@ -5,9 +5,8 @@ function App() {
     const [file, setFile] = useState(null);
     const [nftName, setNftName] = useState("");
     const [action, setAction] = useState("register");
-    const [responseMessage, setResponseMessage] = useState("");
-    const [distance, setDistance] = useState(null);
-    const [threshold, setThreshold] = useState(null);
+    const [verificationResult, setVerificationResult] = useState(null);
+    const [registrationResult, setRegistrationResult] = useState(null);
 
     const connectWallet = async () => {
         if (window.ethereum) {
@@ -38,22 +37,38 @@ function App() {
         formData.append("address", account);
 
         try {
-            const endpoint = action === "register" ? "/register" : "/verify";
-            const response = await fetch(`http://localhost:3001${endpoint}`, {
+            // Fix: Remove the leading slash to avoid double slash in URL
+            const endpoint = action === "register" ? "register" : "verify";
+            
+            // Detailed logging for debugging
+            console.log("Form submission details:", {
+                url: `http://localhost:3001/${endpoint}`,
+                method: 'POST',
+                action: action,
+                nftName: nftName,
+                address: account,
+                hasFile: !!file,
+                fileName: file ? file.name : 'no file'  
+            });
+            
+            const response = await fetch(`http://localhost:3001/${endpoint}`, {
                 method: 'POST',
                 body: formData,
             });
 
-            const data = await response.json();
-
             if (!response.ok) {
-                throw new Error(data.error || `HTTP error! status: ${response.status}`);
+                const error = await response.json().catch(() => ({}));
+                throw new Error(error.error || `HTTP error! status: ${response.status}`);
             }
 
-            setResponseMessage(data.message);
-            if (data.distance !== undefined) {
-                setDistance(data.distance);
-                setThreshold(data.threshold);
+            const data = await response.json();
+
+            if (action === 'register') {
+                setRegistrationResult(data);
+                setVerificationResult(null);
+            } else {
+                setVerificationResult(data);
+                setRegistrationResult(null);
             }
         } catch (error) {
             console.error("Error Details:", {
@@ -62,12 +77,18 @@ function App() {
                 stack: error.stack
             });
 
-            if (error.message.includes("NFT not found")) {
-                setResponseMessage("NFT not found - Please check if the NFT name is correct");
-            } else if (error.message.includes("connect MetaMask")) {
-                setResponseMessage("Please connect your MetaMask wallet first");
+            const errorMessage = error.message.includes("NFT not found") 
+                ? "NFT not found - Please check if the NFT name is correct"
+                : error.message.includes("connect MetaMask")
+                ? "Please connect your MetaMask wallet first"
+                : `Error: ${error.message}`;
+
+            if (action === 'register') {
+                setRegistrationResult({ error: errorMessage });
+                setVerificationResult(null);
             } else {
-                setResponseMessage(`Error: ${error.message}`);
+                setVerificationResult({ error: errorMessage });
+                setRegistrationResult(null);
             }
         }
     };
@@ -115,11 +136,58 @@ function App() {
                     </button>
                 </form>
 
-                {responseMessage && <p style={styles.responseMessage}>{responseMessage}</p>}
-                {distance !== null && threshold !== null && (
-                    <div style={styles.detailsContainer}>
-                        <p>Hamming Distance: {distance}</p>
-                        <p>Threshold: {threshold}</p>
+                {registrationResult && (
+                    <div style={styles.resultBox}>
+                        <h3 style={styles.resultTitle}>Registration Result</h3>
+                        {registrationResult.error ? (
+                            <p style={styles.errorMessage}>{registrationResult.error}</p>
+                        ) : (
+                            <div>
+                                <p style={styles.successMessage}>{registrationResult.message}</p>
+                                <div style={styles.detailsContainer}>
+                                    <p>Transaction Hash: {registrationResult.txHash}</p>
+                                    <p>NFT Name: {registrationResult.details.name}</p>
+                                    <p>pHash: {registrationResult.details.pHash}</p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Only one verification result block should be present. The following is the correct, detailed block: */}
+                {verificationResult && (
+                    <div style={styles.resultBox}>
+                        <h2 style={styles.resultTitle}>Verification Result</h2>
+                        <div style={styles.detailsContainer}>
+                            {verificationResult.error ? (
+                                <p style={styles.errorMessage}>{verificationResult.error}</p>
+                            ) : (
+                                <div>
+                                    {/* Blockchain Section */}
+                                    <div style={styles.verificationSection}>
+                                        <div style={styles.sectionTitle}>Blockchain Verification</div>
+                                        <ul>
+                                            <li><b>Match:</b> {verificationResult.blockchain?.match}</li>
+                                            <li><b>Distance:</b> {verificationResult.blockchain?.distance}</li>
+                                            <li><b>Threshold:</b> {verificationResult.blockchain?.threshold}</li>
+                                            <li><b>Authentic:</b> {verificationResult.blockchain?.isAuthentic ? 'Yes' : 'No'}</li>
+                                        </ul>
+                                    </div>
+                                    {/* AI Model Section */}
+                                    <div style={styles.verificationSection}>
+                                        <div style={styles.sectionTitle}>AI Model Verification</div>
+                                        <ul>
+                                            <li><b>Matched:</b> {verificationResult.aiModel?.matched ? 'Yes' : 'No'}</li>
+                                            <li><b>Similarity:</b> {verificationResult.aiModel?.similarity !== undefined ? (verificationResult.aiModel.similarity * 100).toFixed(2) + '%' : 'N/A'}</li>
+                                        </ul>
+                                    </div>
+                                    {/* Final Conclusion */}
+                                    <div style={styles.finalConclusion}>
+                                        <p>{verificationResult.finalConclusion}</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
@@ -220,19 +288,60 @@ const styles = {
         cursor: "pointer",
         border: "none",
     },
-    responseMessage: {
+    resultBox: {
         marginTop: "20px",
         color: "white",
-        border: "3px solid #ffffff",
+        border: "3px solid #ffffff33",
         borderRadius: "15px",
-        padding: "15px",
-        textAlign: "center",
+        padding: "20px",
         width: "100%",
-        backgroundColor: "#4c1d95",
+        backgroundColor: "#2d3748",
+        boxShadow: "0 4px 15px rgba(0, 0, 0, 0.2)",
+    },
+    resultTitle: {
+        textAlign: "center",
+        marginBottom: "15px",
+        color: "#38b2ac",
+        fontSize: "1.5em",
+        borderBottom: "2px solid #38b2ac33",
+        paddingBottom: "10px",
+    },
+    verificationSection: {
+        marginTop: "15px",
+        padding: "15px",
+        backgroundColor: "#1a202c",
+        borderRadius: "10px",
+        marginBottom: "15px",
+    },
+    sectionTitle: {
+        color: "#38b2ac",
+        marginBottom: "10px",
+        fontSize: "1.2em",
     },
     detailsContainer: {
         marginTop: "15px",
-        color: "yellow",
+        color: "#a0aec0",
+        backgroundColor: "#1a202c",
+        padding: "15px",
+        borderRadius: "10px",
+        wordBreak: "break-all",
+    },
+    successMessage: {
+        color: "#48bb78",
+        textAlign: "center",
+        marginBottom: "15px",
+        fontSize: "1.1em",
+    },
+    errorMessage: {
+        color: "#f56565",
+        textAlign: "center",
+        fontSize: "1.1em",
+    },
+    finalConclusion: {
+        marginTop: "20px",
+        padding: "15px",
+        backgroundColor: "#2c5282",
+        borderRadius: "10px",
         textAlign: "center",
     },
 };
