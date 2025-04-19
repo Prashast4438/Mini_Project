@@ -1,33 +1,64 @@
-# Mini Project: Blockchain Ticket Booking System
+# Mini Project: NFT Registration and Verification System
 
 ## Overview
-This project is a decentralized ticket booking system leveraging blockchain technology for secure, transparent, and automated ticket management. It includes a React frontend, Node.js backend, and Ethereum smart contracts.
+This project is a hybrid AI + blockchain NFT registration and verification system. It enables users to register NFTs by uploading images, which are processed by an AI backend to extract deep image features and compute a perceptual hash (pHash). The pHash and NFT metadata are then registered on the Ethereum blockchain via a custom smart contract, ensuring on-chain authenticity and immutability. The system combines the power of AI-based image verification (off-chain) with decentralized, transparent NFT registration (on-chain).
 
 ## Features
-- **MetaMask wallet integration** for secure user authentication and payments
-- **Automated ticket price calculation** based on real-time distance
-- **Smart contract** for transparent ticket issuance and management
-- **REST API** for distance calculation
-- **Full-stack DApp**: React (frontend), Node.js (backend), Solidity (smart contract)
+- **NFT Registration (On-Chain & Off-Chain):** Register NFTs by uploading images and assigning unique names. The system extracts deep features and computes a perceptual hash (pHash) using AI, storing features off-chain (SQLite) and pHash on-chain (Ethereum smart contract).
+- **NFT Verification:** Verify the authenticity of NFTs by comparing uploaded images to registered ones using AI-based feature extraction (off-chain) and by checking the on-chain pHash.
+- **RESTful API:** Flask server exposes endpoints for registration (`/register`), verification (`/verify`), and hash-based existence checks (`/verify-hash/<name>`).
+- **Smart Contract Integration:** Solidity smart contract (`NFTV.sol`) manages on-chain NFT registration and pHash lookup, ensuring blockchain-backed authenticity.
+- **AI/ML Backend:** Utilizes TensorFlow's MobileNetV2 for robust image feature extraction.
+- **Persistent Storage:** Features are stored in an SQLite database for fast and reliable access; pHash is stored on-chain for transparency and immutability.
+- **Cache Optimization:** Embedding cache improves performance for frequent verification requests.
 
 ## Architecture
-- **Frontend (React):**
-  - MetaMask integration
-  - Source/destination input
-  - Displays calculated distance and ticket price
-  - Interacts with smart contract via Web3.js
+- **AI Server (Flask + TensorFlow):**
+  - Handles image upload, feature extraction, and database management.
+  - Computes perceptual hashes (pHash) for images to enable blockchain integration.
+  - Provides RESTful endpoints for NFT registration and verification.
+- **Database (SQLite):**
+  - Stores extracted image features mapped to NFT names for fast, off-chain verification.
+- **Smart Contract (Solidity - NFTV.sol):**
+  - Stores NFT names and their perceptual hashes (pHash) on the Ethereum blockchain.
+  - Only the contract owner can register new NFTs on-chain.
+  - Anyone can query the contract for the pHash of a registered NFT to verify authenticity.
 - **Backend (Node.js):**
-  - `/calculate-distance` API endpoint
-  - Integrates with external APIs to compute distance
-  - Returns distance in kilometers
-- **Smart Contract (Solidity):**
-  - Receives distance, calculates price
-  - Handles booking and payment in ETH
+  - (If used) Can facilitate integration between frontend, AI server, and smart contract.
+- **Frontend (React):**
+  - (Optional) User interface for uploading images, registering NFTs, and verifying authenticity.
+
+## Project Structure
+```
+Mini_Project_Fresh/
+├── AI_Server/           # Flask + TensorFlow AI backend for feature extraction and verification
+│   └── ai_server.py     # Main server code
+├── Backend/             # (Optional) Node.js backend for API integration
+├── Frontend/            # (Optional) React frontend for user interaction
+├── SmartContract/       # Solidity smart contracts for on-chain NFT registration
+│   └── contracts/
+│       └── NFTV.sol     # Main NFT verification contract
+├── embeddings.db        # SQLite database for off-chain feature storage
+└── uploads/             # Uploaded images
+```
 
 ## Data Flow
-1. User inputs source/destination in frontend
-2. Backend API calculates distance
-3. Distance sent to frontend
+1. User uploads an image and provides an NFT name via the `/register` API endpoint (frontend or API client).
+2. The AI server extracts deep features and computes a perceptual hash (pHash) from the image.
+3. Features are stored off-chain in the SQLite database for fast, AI-powered verification.
+4. The pHash and NFT name are registered on the blockchain via the NFTV smart contract (by the contract owner, using scripts or UI).
+5. For verification, the user uploads an image and specifies the NFT name via the `/verify` endpoint.
+6. The AI server compares the uploaded image's features with the stored features and returns a similarity score and match status.
+7. (Optional) The system or user can query the smart contract to verify that the NFT's pHash is registered on-chain for additional authenticity.
+
+## Smart Contract (NFTV.sol)
+- Written in Solidity for the Ethereum blockchain (see `SmartContract/contracts/NFTV.sol`).
+- Allows the contract owner to register NFT names and their perceptual hashes (pHash).
+- Provides public read access to check if an NFT is registered and to retrieve its pHash.
+- Emits an event when a new NFT is registered.
+- Ensures only unique NFT names are registered.
+
+This hybrid approach combines the power of AI-based image feature extraction for robust verification with the immutability and transparency of blockchain for NFT authenticity.
 4. Frontend interacts with smart contract for booking
 5. Smart contract processes payment and issues ticket
 
