@@ -70,22 +70,6 @@ def load_embeddings_cache(force=False):
             continue
     embeddings_cache_timestamp = current_time
 
-def migrate_json_to_db():
-    json_file = 'embeddings.json'
-    if os.path.exists(json_file):
-        with open(json_file, 'r') as f:
-            json_embeddings = json.load(f)
-        conn = sqlite3.connect(DB_FILE)
-        cursor = conn.cursor()
-        for name, features in json_embeddings.items():
-            features_blob = pickle.dumps(features)
-            cursor.execute('INSERT OR REPLACE INTO embeddings (name, features) VALUES (?, ?)', 
-                          (name, features_blob))
-        conn.commit()
-        conn.close()
-        os.rename(json_file, f"{json_file}.bak")
-
-migrate_json_to_db()
 
 # === Utility Functions ===
 def extract_features(img_path):
