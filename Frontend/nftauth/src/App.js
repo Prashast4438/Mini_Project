@@ -202,7 +202,7 @@ const styles = {
         alignItems: "center",
         justifyContent: "center",
         background: "linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%)", // gradient background
-        padding: "20px",
+       
         color: "white",
     },
     cardBox: {

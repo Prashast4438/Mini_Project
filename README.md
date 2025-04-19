@@ -118,3 +118,4 @@ MIT
 Prashast Nigam
 Dheemanth SM
 Nikhil EB Reddy
+Tanya Sinha
