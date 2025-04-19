@@ -220,7 +220,7 @@ def verify():
         
         # Calculate similarity
         similarity = cosine_similarity(stored_features, uploaded_features)
-        matched = bool(similarity >= 0.75)  # Convert numpy.bool_ to Python bool
+        matched = bool(similarity >=0.90 )  # Convert numpy.bool_ to Python bool
         
         print(f"Verification result: matched={matched}, similarity={similarity}")
         
