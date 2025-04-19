@@ -1,7 +1,7 @@
 # Mini Project: NFT Registration and Verification System
 
 ## Overview
-This project is a hybrid AI + blockchain NFT registration and verification system. It enables users to register NFTs by uploading images, which are processed by an AI backend to extract deep image features and compute a perceptual hash (pHash). The pHash and NFT metadata are then registered on the Ethereum blockchain via a custom smart contract, ensuring on-chain authenticity and immutability. The system combines the power of AI-based image verification (off-chain) with decentralized, transparent NFT registration (on-chain).
+This project is a hybrid AI + Blockchain NFT registration and verification system. It enables users to register NFTs by uploading images, which are processed by an AI backend to extract deep image features and compute a perceptual hash (pHash). The pHash and NFT metadata are then registered on the Ethereum blockchain via a custom smart contract, ensuring on-chain authenticity and immutability. The system combines the power of AI-based image verification (off-chain) with decentralized, transparent NFT registration (on-chain).
 
 ## Features
 - **NFT Registration (On-Chain & Off-Chain):** Register NFTs by uploading images and assigning unique names. The system extracts deep features and computes a perceptual hash (pHash)  storing features off-chain (SQLite) and pHash on-chain (Ethereum smart contract).
