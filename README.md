@@ -4,8 +4,9 @@
 This project is a hybrid AI + blockchain NFT registration and verification system. It enables users to register NFTs by uploading images, which are processed by an AI backend to extract deep image features and compute a perceptual hash (pHash). The pHash and NFT metadata are then registered on the Ethereum blockchain via a custom smart contract, ensuring on-chain authenticity and immutability. The system combines the power of AI-based image verification (off-chain) with decentralized, transparent NFT registration (on-chain).
 
 ## Features
-- **NFT Registration (On-Chain & Off-Chain):** Register NFTs by uploading images and assigning unique names. The system extracts deep features and computes a perceptual hash (pHash) using AI, storing features off-chain (SQLite) and pHash on-chain (Ethereum smart contract).
+- **NFT Registration (On-Chain & Off-Chain):** Register NFTs by uploading images and assigning unique names. The system extracts deep features and computes a perceptual hash (pHash)  storing features off-chain (SQLite) and pHash on-chain (Ethereum smart contract).
 - **NFT Verification:** Verify the authenticity of NFTs by comparing uploaded images to registered ones using AI-based feature extraction (off-chain) and by checking the on-chain pHash.
+- **Hamming Distance Verification:** During NFT verification, the backend computes the perceptual hash (pHash) of the uploaded image and compares it to the pHash stored on-chain using Hamming distance. A low Hamming distance indicates high visual similarity, ensuring robust and efficient image authenticity checks.
 - **RESTful API:** Flask server exposes endpoints for registration (`/register`), verification (`/verify`), and hash-based existence checks (`/verify-hash/<name>`).
 - **Smart Contract Integration:** Solidity smart contract (`NFTV.sol`) manages on-chain NFT registration and pHash lookup, ensuring blockchain-backed authenticity.
 - **AI/ML Backend:** Utilizes TensorFlow's MobileNetV2 for robust image feature extraction.
@@ -44,12 +45,13 @@ Mini_Project_Fresh/
 
 ## Data Flow
 1. User uploads an image and provides an NFT name via the `/register` API endpoint (frontend or API client).
-2. The AI server extracts deep features and computes a perceptual hash (pHash) from the image.
+2. The AI server extracts deep features and backend computes a perceptual hash (pHash) from the image.
 3. Features are stored off-chain in the SQLite database for fast, AI-powered verification.
 4. The pHash and NFT name are registered on the blockchain via the NFTV smart contract (by the contract owner, using scripts or UI).
 5. For verification, the user uploads an image and specifies the NFT name via the `/verify` endpoint.
-6. The AI server compares the uploaded image's features with the stored features and returns a similarity score and match status.
-7. (Optional) The system or user can query the smart contract to verify that the NFT's pHash is registered on-chain for additional authenticity.
+6. The backend computes the pHash for the uploaded image and retrieves the on-chain pHash from the smart contract.
+7. The backend compares both pHashes using Hamming distance. If the distance is below a set threshold, the NFT is considered a match.
+8. The system or user can queries the smart contract to verify that the NFT's pHash is registered on-chain for additional authenticity.
 
 ## Smart Contract (NFTV.sol)
 - Written in Solidity for the Ethereum blockchain (see `SmartContract/contracts/NFTV.sol`).
@@ -57,10 +59,9 @@ Mini_Project_Fresh/
 - Provides public read access to check if an NFT is registered and to retrieve its pHash.
 - Emits an event when a new NFT is registered.
 - Ensures only unique NFT names are registered.
+- The smart contract stores the pHash for each NFT, enabling Hamming distance-based verification of image authenticity by the backend.
 
 This hybrid approach combines the power of AI-based image feature extraction for robust verification with the immutability and transparency of blockchain for NFT authenticity.
-4. Frontend interacts with smart contract for booking
-5. Smart contract processes payment and issues ticket
 
 ## Project Structure
 ```
